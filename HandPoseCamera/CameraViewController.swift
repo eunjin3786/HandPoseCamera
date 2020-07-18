@@ -16,7 +16,6 @@ class CameraViewController: UIViewController {
     
     private weak var timerLabel: UILabel?
     
-    private var timerIntervalCount = 0
     private var isTimerRunning = false
     
     override func viewDidLoad() {
@@ -90,11 +89,7 @@ class CameraViewController: UIViewController {
     
     @objc
     private func captureButtonDidTap() {
-        if isTimerRunning == false {
-            runTimer(seconds: 3, completion: {
-                self.captureImage()
-            })
-        }
+        self.captureImage()
     }
     
     private func captureImage() {
@@ -102,25 +97,26 @@ class CameraViewController: UIViewController {
         let settings = AVCapturePhotoSettings()
         photoOutput.capturePhoto(with: settings, delegate: self)
     }
-    
+
     private func runTimer(seconds: Int, completion: @escaping () -> Void) {
         isTimerRunning = true
-        timerIntervalCount = 0
+
+        var timeLeft = seconds
         
         let timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true, block: { timer in
-            let remainedSecond = seconds - self.timerIntervalCount
-            self.timerLabel?.text = "\(remainedSecond)"
-            self.timerIntervalCount += 1
+            self.timerLabel?.text = "\(timeLeft)"
+            timeLeft -= 1
+            
+            if timeLeft < 0 {
+                timer.invalidate()
+                self.isTimerRunning = false
+                self.timerLabel?.text = nil
+            
+                completion()
+            }
         })
         
-        // 3 -> 2 -> 1 할때 1이 너무 금방 사라져서 0.5를 더함.
-        DispatchQueue.main.asyncAfter(deadline: .now() + Double(seconds) + 0.5) {
-            self.isTimerRunning = false
-            self.timerLabel?.text = nil
-            
-            timer.invalidate()
-            completion()
-        }
+        RunLoop.current.add(timer, forMode: RunLoop.Mode.common)
     }
 }
 
