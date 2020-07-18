@@ -1,6 +1,7 @@
 import UIKit
 import AVFoundation
 import Vision
+import Photos
 
 class CameraViewController: UIViewController {
 
@@ -17,6 +18,7 @@ class CameraViewController: UIViewController {
         prepareCaptureSession()
         prepareCaptureUI()
         prepareEmojiView()
+        prepareControls()
         
         handPoseRequest.maximumHandCount = 1
     }
@@ -55,6 +57,19 @@ class CameraViewController: UIViewController {
         view.addSubview(emojiView)
         
         self.emojiView = emojiView
+    }
+    
+    private func prepareControls() {
+        let captureButton = UIButton()
+        captureButton.frame = CGRect(x: 10, y: 10, width: 100, height: 100)
+        captureButton.addTarget(self, action: #selector(captureButtonDidTap), for: .touchUpInside)
+    }
+    
+    @objc
+    private func captureButtonDidTap() {
+        guard let photoOutput = captureSession?.outputs.first as? AVCapturePhotoOutput else { return }
+        let settings = AVCapturePhotoSettings()
+        photoOutput.capturePhoto(with: settings, delegate: self)
     }
 }
 
@@ -128,4 +143,14 @@ extension VNRecognizedPoint {
     var toAVFoundationPoint: CGPoint {
         return CGPoint(x: self.location.x, y: 1 - self.location.y)
     }
+}
+
+extension CameraViewController: AVCapturePhotoCaptureDelegate {
+    
+    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+        guard let imageData = photo.fileDataRepresentation() else { return }
+        guard let image = UIImage(data: imageData) else { return }
+        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+    }
+    
 }
