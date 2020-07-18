@@ -3,10 +3,13 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AC5F900B24C3526700C85582 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = AC5F900A24C3526700C85582 /* SnapKit */; };
+		AC5F900E24C3618700C85582 /* JinnyAppKit in Frameworks */ = {isa = PBXBuildFile; productRef = AC5F900D24C3618700C85582 /* JinnyAppKit */; };
+		AC5F901124C36D2300C85582 /* VNRecognizedPoint+.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5F901024C36D2300C85582 /* VNRecognizedPoint+.swift */; };
 		AC99CF3324B0A15500C54CE2 /* HandGestureProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC99CF3224B0A15500C54CE2 /* HandGestureProcessor.swift */; };
 		ACBD85EC24A4E3A7002F7C9C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACBD85EB24A4E3A7002F7C9C /* AppDelegate.swift */; };
 		ACBD85EE24A4E3A7002F7C9C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACBD85ED24A4E3A7002F7C9C /* SceneDelegate.swift */; };
@@ -36,6 +39,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		AC5F901024C36D2300C85582 /* VNRecognizedPoint+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VNRecognizedPoint+.swift"; sourceTree = "<group>"; };
 		AC99CF3224B0A15500C54CE2 /* HandGestureProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandGestureProcessor.swift; sourceTree = "<group>"; };
 		ACBD85E824A4E3A7002F7C9C /* HandPoseCamera.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HandPoseCamera.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACBD85EB24A4E3A7002F7C9C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -58,6 +62,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AC5F900E24C3618700C85582 /* JinnyAppKit in Frameworks */,
+				AC5F900B24C3526700C85582 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +84,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		AC5F900F24C36CD000C85582 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				AC5F901024C36D2300C85582 /* VNRecognizedPoint+.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		ACBD85DF24A4E3A7002F7C9C = {
 			isa = PBXGroup;
 			children = (
@@ -101,6 +115,7 @@
 		ACBD85EA24A4E3A7002F7C9C /* HandPoseCamera */ = {
 			isa = PBXGroup;
 			children = (
+				AC5F900F24C36CD000C85582 /* Extensions */,
 				ACBD85EB24A4E3A7002F7C9C /* AppDelegate.swift */,
 				ACBD85ED24A4E3A7002F7C9C /* SceneDelegate.swift */,
 				ACBD85EF24A4E3A7002F7C9C /* CameraViewController.swift */,
@@ -147,6 +162,10 @@
 			dependencies = (
 			);
 			name = HandPoseCamera;
+			packageProductDependencies = (
+				AC5F900A24C3526700C85582 /* SnapKit */,
+				AC5F900D24C3618700C85582 /* JinnyAppKit */,
+			);
 			productName = HandPoseCamera;
 			productReference = ACBD85E824A4E3A7002F7C9C /* HandPoseCamera.app */;
 			productType = "com.apple.product-type.application";
@@ -219,6 +238,10 @@
 				Base,
 			);
 			mainGroup = ACBD85DF24A4E3A7002F7C9C;
+			packageReferences = (
+				AC5F900924C3526700C85582 /* XCRemoteSwiftPackageReference "SnapKit" */,
+				AC5F900C24C3618600C85582 /* XCRemoteSwiftPackageReference "JinnyAppKit" */,
+			);
 			productRefGroup = ACBD85E924A4E3A7002F7C9C /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -266,6 +289,7 @@
 				ACBD85EC24A4E3A7002F7C9C /* AppDelegate.swift in Sources */,
 				ACBD85EE24A4E3A7002F7C9C /* SceneDelegate.swift in Sources */,
 				AC99CF3324B0A15500C54CE2 /* HandGestureProcessor.swift in Sources */,
+				AC5F901124C36D2300C85582 /* VNRecognizedPoint+.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -596,6 +620,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AC5F900924C3526700C85582 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.1;
+			};
+		};
+		AC5F900C24C3618600C85582 /* XCRemoteSwiftPackageReference "JinnyAppKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/eunjin3786/JinnyAppKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.6;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AC5F900A24C3526700C85582 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AC5F900924C3526700C85582 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+		AC5F900D24C3618700C85582 /* JinnyAppKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AC5F900C24C3618600C85582 /* XCRemoteSwiftPackageReference "JinnyAppKit" */;
+			productName = JinnyAppKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = ACBD85E024A4E3A7002F7C9C /* Project object */;
 }

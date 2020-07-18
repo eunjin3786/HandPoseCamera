@@ -1,7 +1,10 @@
 import UIKit
+import Foundation
 import AVFoundation
 import Vision
 import Photos
+import SnapKit
+import JinnyAppKit
 
 class CameraViewController: UIViewController {
 
@@ -11,18 +14,22 @@ class CameraViewController: UIViewController {
     private let handPoseRequest = VNDetectHumanHandPoseRequest()
     private let handGestureProcessor = HandGestureProcessor()
     
-    private weak var emojiView: UILabel?
+    private weak var timerLabel: UILabel?
+    
+    private var timerIntervalCount = 0
+    private var isTimerRunning = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
         prepareCaptureSession()
         prepareCaptureUI()
-        prepareEmojiView()
-        prepareControls()
+        
+        prepareTimerView()
+        prepareBottomControls()
         
         handPoseRequest.maximumHandCount = 1
     }
-    
+
     private func prepareCaptureSession() {
         let captureSession = AVCaptureSession()
         
@@ -52,27 +59,68 @@ class CameraViewController: UIViewController {
         self.videoPreviewLayer = videoPreviewLayer
     }
     
-    private func prepareEmojiView() {
-        let emojiView = UILabel()
-        emojiView.frame = self.view.bounds
-        emojiView.textAlignment = .center
-        emojiView.font = UIFont.systemFont(ofSize: 300)
-        view.addSubview(emojiView)
+    private func prepareTimerView() {
+        let timerLabel = UILabel()
+        timerLabel.textAlignment = .center
+        timerLabel.font = UIFont.systemFont(ofSize: 300)
         
-        self.emojiView = emojiView
+        view.addSubview(timerLabel)
+        timerLabel.snp.makeConstraints { maker in
+            maker.center.equalToSuperview()
+        }
+        
+        self.timerLabel = timerLabel
     }
     
-    private func prepareControls() {
+    private func prepareBottomControls() {
         let captureButton = UIButton()
-        captureButton.frame = CGRect(x: 10, y: 10, width: 100, height: 100)
+        let symbolConfig = UIImage.SymbolConfiguration(pointSize: 100, weight: .bold, scale: .large)
+        let symbolImage = UIImage(systemName: "camera.circle", withConfiguration: symbolConfig)
+        captureButton.setImage(symbolImage, for: .normal)
+        captureButton.tintColor = .systemYellow
         captureButton.addTarget(self, action: #selector(captureButtonDidTap), for: .touchUpInside)
+        
+        view.addSubview(captureButton)
+        captureButton.snp.makeConstraints { maker in
+            maker.bottom.equalToSuperview().offset(-40)
+            maker.centerX.equalToSuperview()
+            maker.width.height.equalTo(100)
+        }
     }
     
     @objc
     private func captureButtonDidTap() {
+        if isTimerRunning == false {
+            runTimer(seconds: 3, completion: {
+                self.captureImage()
+            })
+        }
+    }
+    
+    private func captureImage() {
         guard let photoOutput = captureSession?.outputs.first(where: { $0 is AVCapturePhotoOutput }) as? AVCapturePhotoOutput else { return }
         let settings = AVCapturePhotoSettings()
         photoOutput.capturePhoto(with: settings, delegate: self)
+    }
+    
+    private func runTimer(seconds: Int, completion: @escaping () -> Void) {
+        isTimerRunning = true
+        timerIntervalCount = 0
+        
+        let timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true, block: { timer in
+            let remainedSecond = seconds - self.timerIntervalCount
+            self.timerLabel?.text = "\(remainedSecond)"
+            self.timerIntervalCount += 1
+        })
+        
+        // 3 -> 2 -> 1 할때 1이 너무 금방 사라져서 0.5를 더함.
+        DispatchQueue.main.asyncAfter(deadline: .now() + Double(seconds) + 0.5) {
+            self.isTimerRunning = false
+            self.timerLabel?.text = nil
+            
+            timer.invalidate()
+            completion()
+        }
     }
 }
 
@@ -99,22 +147,39 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
                 return
             }
             
-            // Ignore low confidence points.
-            guard thumbTipPoint.confidence > 0.3 || indexTipPoint.confidence > 0.3 else {
-                emojiView?.text = "😭"
+            let middlePoints = try observation.recognizedPoints(forGroupKey: .handLandmarkRegionKeyMiddleFinger)
+            guard let middleMcpPoint = middlePoints[.handLandmarkKeyMiddleMCP] else {
                 return
             }
             
+            let ringPoints = try observation.recognizedPoints(forGroupKey: .handLandmarkRegionKeyRingFinger)
+            guard let ringMcpPoint = ringPoints[.handLandmarkKeyRingMCP] else {
+                return
+            }
+            
+            let littlePoints = try observation.recognizedPoints(forGroupKey: .handLandmarkRegionKeyLittleFinger)
+            guard let littleMcpPoint = littlePoints[.handLandmarkKeyLittleMCP] else {
+                return
+            }
+
             DispatchQueue.main.async {
                 self.processPoints(thumbTipPoint: thumbTipPoint,
-                                   indexTipPoint: indexTipPoint)
+                                   indexTipPoint: indexTipPoint,
+                                   middleMcpPoint: middleMcpPoint,
+                                   ringMcpPoint: ringMcpPoint,
+                                   littleMcpPoint: littleMcpPoint)
             }
         } catch {
-            print("에러 \(error)")
+            print(error)
         }
     }
     
-    private func processPoints(thumbTipPoint: VNRecognizedPoint, indexTipPoint: VNRecognizedPoint) {
+    private func processPoints(thumbTipPoint: VNRecognizedPoint, indexTipPoint: VNRecognizedPoint, middleMcpPoint: VNRecognizedPoint, ringMcpPoint: VNRecognizedPoint, littleMcpPoint: VNRecognizedPoint) {
+        
+        // Ignore low confidence points.
+        guard thumbTipPoint.confidence > 0.3 && indexTipPoint.confidence > 0.3 && middleMcpPoint.confidence > 0.3 && ringMcpPoint.confidence > 0.3 && littleMcpPoint.confidence > 0.3 else {
+            return
+        }
         
         guard let thumbTipUIKitPoint = videoPreviewLayer?.layerPointConverted(fromCaptureDevicePoint: thumbTipPoint.toAVFoundationPoint) else {
             return
@@ -124,27 +189,30 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             return
         }
         
-        let state = handGestureProcessor.getHandState(thumbTip: thumbTipUIKitPoint, indexTip: indexTipUIKitPoint)
+        guard let middleMcpUIKitPoint = videoPreviewLayer?.layerPointConverted(fromCaptureDevicePoint: middleMcpPoint.toAVFoundationPoint) else {
+            return
+        }
+        
+        guard let ringMcpUIKitPoint = videoPreviewLayer?.layerPointConverted(fromCaptureDevicePoint: ringMcpPoint.toAVFoundationPoint) else {
+            return
+        }
+        
+        guard let littleMcpUIKitPoint = videoPreviewLayer?.layerPointConverted(fromCaptureDevicePoint: littleMcpPoint.toAVFoundationPoint) else {
+            return
+        }
+
+        let state = handGestureProcessor.getHandState(thumbTip: thumbTipUIKitPoint, indexTip: indexTipUIKitPoint, middleMcp: middleMcpUIKitPoint, ringMcp: ringMcpUIKitPoint, littleMcp: littleMcpUIKitPoint)
         
         switch state {
-        case .thumbUp:
-            emojiView?.text = "👍"
-        case .thumbDown:
-            emojiView?.text = "👎"
         case .pinched:
-            emojiView?.text = "👌"
+            if isTimerRunning == false {
+                runTimer(seconds: 3, completion: {
+                    self.captureImage()
+                })
+            }
         case .unknown:
             break
         }
-
-        print(state)
-    }
-}
-
-extension VNRecognizedPoint {
-    
-    var toAVFoundationPoint: CGPoint {
-        return CGPoint(x: self.location.x, y: 1 - self.location.y)
     }
 }
 
