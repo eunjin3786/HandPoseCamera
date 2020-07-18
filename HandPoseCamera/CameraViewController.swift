@@ -18,7 +18,6 @@ class CameraViewController: UIViewController {
         prepareCaptureUI()
         prepareEmojiView()
         
-        // The default value for this property is 2.
         handPoseRequest.maximumHandCount = 1
     }
     
@@ -67,56 +66,66 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
         
         do {
             try handler.perform([handPoseRequest])
-            // Continue only when a hand was detected in the frame.
-            // Since we set the maximumHandCount property of the request to 1, there will be at most one observation.
+            
             guard let observation = handPoseRequest.results?.first as? VNRecognizedPointsObservation else {
                 return
             }
-            // type: [VNRecognizedPointKey : VNRecognizedPoint]
-            let thumbPoints = try observation.recognizedPoints(forGroupKey: .handLandmarkRegionKeyThumb)
             
-            // type: VNRecognizedPoint?
+            let thumbPoints = try observation.recognizedPoints(forGroupKey: .handLandmarkRegionKeyThumb)
             guard let thumbTipPoint = thumbPoints[.handLandmarkKeyThumbTIP] else {
-                emojiView?.text = "😰"
+                return
+            }
+            
+            let indexPoints = try observation.recognizedPoints(forGroupKey: .handLandmarkRegionKeyIndexFinger)
+            guard let indexTipPoint = indexPoints[.handLandmarkKeyIndexTIP] else {
                 return
             }
             
             // Ignore low confidence points.
-            guard thumbTipPoint.confidence > 0.3 else {
+            guard thumbTipPoint.confidence > 0.3 || indexTipPoint.confidence > 0.3 else {
                 emojiView?.text = "😭"
                 return
             }
             
             DispatchQueue.main.async {
-                self.processPoints(thumbTipPoint: thumbTipPoint)
+                self.processPoints(thumbTipPoint: thumbTipPoint,
+                                   indexTipPoint: indexTipPoint)
             }
         } catch {
             print("에러 \(error)")
         }
     }
     
-    private func processPoints(thumbTipPoint: VNRecognizedPoint) {
-        // Convert points from Vision coordinates to AVFoundation coordinates.
-        let thumbTipCGPoint = CGPoint(x: thumbTipPoint.location.x, y: 1 - thumbTipPoint.location.y)
+    private func processPoints(thumbTipPoint: VNRecognizedPoint, indexTipPoint: VNRecognizedPoint) {
         
-        // Convert points from AVFoundation coordinates to UIKit coordinates.
-        guard let thumbTipConvertedPoint = videoPreviewLayer?.layerPointConverted(fromCaptureDevicePoint: thumbTipCGPoint) else {
-            emojiView?.text = "😱"
+        guard let thumbTipUIKitPoint = videoPreviewLayer?.layerPointConverted(fromCaptureDevicePoint: thumbTipPoint.toAVFoundationPoint) else {
             return
         }
-
-        let state = handGestureProcessor.getHandState(thumbTip: thumbTipConvertedPoint, center: self.view.center)
+        
+        guard let indexTipUIKitPoint = videoPreviewLayer?.layerPointConverted(fromCaptureDevicePoint: indexTipPoint.toAVFoundationPoint) else {
+            return
+        }
+        
+        let state = handGestureProcessor.getHandState(thumbTip: thumbTipUIKitPoint, indexTip: indexTipUIKitPoint)
         
         switch state {
         case .thumbUp:
             emojiView?.text = "👍"
         case .thumbDown:
             emojiView?.text = "👎"
+        case .pinched:
+            emojiView?.text = "👌"
+        case .unknown:
+            break
         }
 
-        print("1. Vision Coordinates: \(thumbTipPoint)")
-        print("2. AVFoundation coordinates: \(thumbTipCGPoint)")
-        print("3. UIKit coordinates: \(thumbTipConvertedPoint)")
         print(state)
+    }
+}
+
+extension VNRecognizedPoint {
+    
+    var toAVFoundationPoint: CGPoint {
+        return CGPoint(x: self.location.x, y: 1 - self.location.y)
     }
 }
