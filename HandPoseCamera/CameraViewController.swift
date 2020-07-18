@@ -31,10 +31,13 @@ class CameraViewController: UIViewController {
         guard let input = try? AVCaptureDeviceInput(device: captureDevice) else { return }
         captureSession.addInput(input)
 
-        let output = AVCaptureVideoDataOutput()
-        output.setSampleBufferDelegate(self, queue: .main)
-        captureSession.addOutput(output)
+        let videoOutput = AVCaptureVideoDataOutput()
+        videoOutput.setSampleBufferDelegate(self, queue: .main)
+        captureSession.addOutput(videoOutput)
 
+        let photoOutput = AVCapturePhotoOutput()
+        captureSession.addOutput(photoOutput)
+        
         self.captureSession = captureSession
         self.captureSession?.startRunning()
     }
@@ -67,7 +70,7 @@ class CameraViewController: UIViewController {
     
     @objc
     private func captureButtonDidTap() {
-        guard let photoOutput = captureSession?.outputs.first as? AVCapturePhotoOutput else { return }
+        guard let photoOutput = captureSession?.outputs.first(where: { $0 is AVCapturePhotoOutput }) as? AVCapturePhotoOutput else { return }
         let settings = AVCapturePhotoSettings()
         photoOutput.capturePhoto(with: settings, delegate: self)
     }
@@ -152,5 +155,4 @@ extension CameraViewController: AVCapturePhotoCaptureDelegate {
         guard let image = UIImage(data: imageData) else { return }
         UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
     }
-    
 }
