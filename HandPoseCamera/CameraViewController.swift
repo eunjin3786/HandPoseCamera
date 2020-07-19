@@ -157,14 +157,12 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             guard let littleMcpPoint = littlePoints[.handLandmarkKeyLittleMCP] else {
                 return
             }
-
-            DispatchQueue.main.async {
-                self.processPoints(thumbTipPoint: thumbTipPoint,
-                                   indexTipPoint: indexTipPoint,
-                                   middleMcpPoint: middleMcpPoint,
-                                   ringMcpPoint: ringMcpPoint,
-                                   littleMcpPoint: littleMcpPoint)
-            }
+            
+            self.processPoints(thumbTipPoint: thumbTipPoint,
+                               indexTipPoint: indexTipPoint,
+                               middleMcpPoint: middleMcpPoint,
+                               ringMcpPoint: ringMcpPoint,
+                               littleMcpPoint: littleMcpPoint)
         } catch {
             print(error)
         }

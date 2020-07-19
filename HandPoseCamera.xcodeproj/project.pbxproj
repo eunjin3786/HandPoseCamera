@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		AC5F900B24C3526700C85582 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = AC5F900A24C3526700C85582 /* SnapKit */; };
-		AC5F900E24C3618700C85582 /* JinnyAppKit in Frameworks */ = {isa = PBXBuildFile; productRef = AC5F900D24C3618700C85582 /* JinnyAppKit */; };
 		AC5F901124C36D2300C85582 /* VNRecognizedPoint+.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5F901024C36D2300C85582 /* VNRecognizedPoint+.swift */; };
 		AC99CF3324B0A15500C54CE2 /* HandGestureProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC99CF3224B0A15500C54CE2 /* HandGestureProcessor.swift */; };
 		ACBD85EC24A4E3A7002F7C9C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACBD85EB24A4E3A7002F7C9C /* AppDelegate.swift */; };
@@ -62,7 +61,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AC5F900E24C3618700C85582 /* JinnyAppKit in Frameworks */,
 				AC5F900B24C3526700C85582 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -164,7 +162,6 @@
 			name = HandPoseCamera;
 			packageProductDependencies = (
 				AC5F900A24C3526700C85582 /* SnapKit */,
-				AC5F900D24C3618700C85582 /* JinnyAppKit */,
 			);
 			productName = HandPoseCamera;
 			productReference = ACBD85E824A4E3A7002F7C9C /* HandPoseCamera.app */;
@@ -240,7 +237,6 @@
 			mainGroup = ACBD85DF24A4E3A7002F7C9C;
 			packageReferences = (
 				AC5F900924C3526700C85582 /* XCRemoteSwiftPackageReference "SnapKit" */,
-				AC5F900C24C3618600C85582 /* XCRemoteSwiftPackageReference "JinnyAppKit" */,
 			);
 			productRefGroup = ACBD85E924A4E3A7002F7C9C /* Products */;
 			projectDirPath = "";
@@ -630,14 +626,6 @@
 				minimumVersion = 5.0.1;
 			};
 		};
-		AC5F900C24C3618600C85582 /* XCRemoteSwiftPackageReference "JinnyAppKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/eunjin3786/JinnyAppKit.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.1.6;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -645,11 +633,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AC5F900924C3526700C85582 /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
-		};
-		AC5F900D24C3618700C85582 /* JinnyAppKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = AC5F900C24C3618600C85582 /* XCRemoteSwiftPackageReference "JinnyAppKit" */;
-			productName = JinnyAppKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

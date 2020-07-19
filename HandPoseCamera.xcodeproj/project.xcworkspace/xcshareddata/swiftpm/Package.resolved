@@ -2,15 +2,6 @@
   "object": {
     "pins": [
       {
-        "package": "JinnyAppKit",
-        "repositoryURL": "https://github.com/eunjin3786/JinnyAppKit.git",
-        "state": {
-          "branch": null,
-          "revision": "bad6ef87b18a53cfcd0fed15433cd93940559976",
-          "version": "0.1.6"
-        }
-      },
-      {
         "package": "SnapKit",
         "repositoryURL": "https://github.com/SnapKit/SnapKit",
         "state": {
