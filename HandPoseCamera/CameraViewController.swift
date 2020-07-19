@@ -4,7 +4,6 @@ import AVFoundation
 import Vision
 import Photos
 import SnapKit
-import JinnyAppKit
 
 class CameraViewController: UIViewController {
 
